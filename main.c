@@ -13,6 +13,8 @@ void showLoginPanel();
 int authenticateUser(char* username, char* password);
 void showMenu();
 void addCoffee();
+void sellCoffee();
+void showInventory();
 void removeCoffee();
 void exitProgram();
 
@@ -73,8 +75,10 @@ void showMenu() {
         printf("******************    MENU    *******************\n");
         printf("**************************************************\n");
         printf("1. Add Coffee\n");
-        printf("2. Remove Coffee\n");
-        printf("3. Exit Program\n");
+        printf("2. Sell Coffee\n");
+        printf("3. Show Inventory\n");
+        printf("4. Remove Coffee\n");
+        printf("5. Exit Program\n");
         printf("Enter your choice: ");
         scanf("%d", &choice);
 
@@ -83,9 +87,15 @@ void showMenu() {
                 addCoffee();
                 break;
             case 2:
-                removeCoffee();
+                sellCoffee();
                 break;
             case 3:
+                showInventory();
+                break;
+            case 4:
+                removeCoffee();
+                break;
+            case 5:
                 exitProgram();
                 break;
             default:
@@ -93,7 +103,7 @@ void showMenu() {
         }
 
         printf("\n");
-    } while (choice != 3);
+    } while (choice != 5);
 }
 
 void createDatabaseFile() {
@@ -147,6 +157,99 @@ void addCoffee() {
     fclose(file);
 
     printf("Coffee added successfully!\n");
+}
+
+void sellCoffee() {
+    printf("**************    SELL COFFEE   *****************\n");
+    printf("**************************************************\n");
+
+    int id;
+    int quantity;
+
+    printf("Enter the ID of the coffee to sell: ");
+    scanf("%d", &id);
+    printf("Enter the quantity to sell: ");
+    scanf("%d", &quantity);
+
+    FILE* file = fopen("database.txt", "r+");
+    if (file == NULL) {
+        printf("Error opening the file.\n");
+        return;
+    }
+
+    char line[100];
+    int found = 0;
+    int updatedQuantity = 0;
+    long int currentPosition = 0;
+
+    while (fgets(line, sizeof(line), file)) {
+        int coffeeId;
+        char coffeeName[MAX_COFFEE_NAME_LENGTH];
+        float price;
+        int stockQuantity;
+
+        sscanf(line, "%d,%[^,],%f,%d", &coffeeId, coffeeName, &price, &stockQuantity);
+
+        if (coffeeId == id) {
+            found = 1;
+
+            if (quantity <= stockQuantity) {
+                updatedQuantity = stockQuantity - quantity;
+                fseek(file, currentPosition, SEEK_SET);
+                fprintf(file, "%d,%s,%.2f,%d\n", coffeeId, coffeeName, price, updatedQuantity);
+                printf("Coffee sold successfully!\n");
+
+                // Update balance
+                FILE* balanceFile = fopen("balance.txt", "a");
+                if (balanceFile == NULL) {
+                    printf("Error opening the balance file.\n");
+                    fclose(file);
+                    return;
+                }
+
+                float totalAmount = price * quantity;
+                fprintf(balanceFile, "%.2f\n", totalAmount);
+                fclose(balanceFile);
+            } else {
+                printf("Insufficient quantity in stock.\n");
+            }
+            break;
+        }
+
+        currentPosition = ftell(file);
+    }
+
+    if (!found) {
+        printf("Coffee not found in stock.\n");
+    }
+
+    fclose(file);
+}
+
+void showInventory() {
+    printf("**************    INVENTORY    ******************\n");
+    printf("**************************************************\n");
+    printf("ID\tCoffee Name\tPrice\tQuantity\n");
+    printf("===============================================\n");
+
+    FILE* file = fopen("database.txt", "r");
+    if (file == NULL) {
+        printf("Error opening the file.\n");
+        return;
+    }
+
+    char line[100];
+    while (fgets(line, sizeof(line), file)) {
+        int coffeeId;
+        char coffeeName[MAX_COFFEE_NAME_LENGTH];
+        float price;
+        int quantity;
+
+        sscanf(line, "%d,%[^,],%f,%d", &coffeeId, coffeeName, &price, &quantity);
+        printf("%d\t%s\t\t%.2f\t%d\n", coffeeId, coffeeName, price, quantity);
+    }
+
+    fclose(file);
 }
 
 void removeCoffee() {
