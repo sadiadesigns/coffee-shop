@@ -69,4 +69,4 @@ This project is licensed under the [MIT License](LICENSE). Feel free to modify a
 
 ## Contact
 
-If you have any questions or suggestions regarding Sadia's Coffee Shop, please feel free to contact me at [your-email@example.com](mailto:your-email@example.com).
+If you have any questions or suggestions regarding Sadia's Coffee Shop, please feel free to contact me at [your-email@example.com](mailto:sadia.ahmed05@northsouth.edu).
