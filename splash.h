@@ -10,7 +10,7 @@ void showSplashScreen() {
     printf("**************************************************\n");
     printf("********        SADIA'S COFFEE SHOP        *******\n");
     printf("**************************************************\n\n");
-    delay(2);
+    delay(4);
     system("clear"); // Clear the screen
 }
 
